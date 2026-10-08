@@ -1,5 +1,7 @@
 # Scrcpy Visual
 
+![Scrcpy Visual remote and mirror](assets/scrcpy-visual-demo.png)
+
 A native macOS remote for Android TV devices and Android boxes. It sends navigation, media, and volume keys over ADB and opens a separate scrcpy mirror window.
 
 ## Get started
