@@ -37,7 +37,9 @@ final class RemoteController: ObservableObject {
     private var environment: [String: String] {
         var values = ProcessInfo.processInfo.environment
         values["ADB_SERVER_SOCKET"] = "tcp:127.0.0.1:\(serverPort)"
-        let privateHome = resourceDirectory.appendingPathComponent("Private/home")
+        let privateHome = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Scrcpy Visual", isDirectory: true)
+            .appendingPathComponent("adb-home", isDirectory: true)
         let key = privateHome.appendingPathComponent(".android/adbkey")
         if FileManager.default.fileExists(atPath: key.path) {
             values["HOME"] = privateHome.path

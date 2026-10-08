@@ -21,10 +21,12 @@ cat > "$CONTENTS/Info.plist" <<'PLIST'
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
   <key>CFBundleName</key><string>Scrcpy Visual</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.1.0</string>
-  <key>CFBundleVersion</key><string>3</string>
+  <key>CFBundleShortVersionString</key><string>1.1.1</string>
+  <key>CFBundleVersion</key><string>4</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
+  <key>CFBundleIconFile</key>
+  <string>ScrcpyVisual.icns</string>
 </dict>
 </plist>
 PLIST
@@ -35,3 +37,5 @@ if [ -n "${SCRCPY_DIR:-}" ]; then
 fi
 
 printf 'Built %s\n' "$OUT_APP"
+
+/bin/cp assets/ScrcpyVisual.icns "$CONTENTS/Resources/ScrcpyVisual.icns"
