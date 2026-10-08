@@ -17,6 +17,7 @@ final class RemoteController: ObservableObject {
     private let work = DispatchQueue(label: "com.delitants.FireTVRemoteMac.adb")
     private let serverPort = "5038"
     private var endpoint = ""
+    private var isBueller = false
     private var mirrorProcess: Process?
 
     private var resourceDirectory: URL {
@@ -34,7 +35,7 @@ final class RemoteController: ObservableObject {
 
     private var environment: [String: String] {
         var values = ProcessInfo.processInfo.environment
-        values["ADB_SERVER_PORT"] = serverPort
+        values["ADB_SERVER_SOCKET"] = "tcp:127.0.0.1:\(serverPort)"
         let privateHome = resourceDirectory.appendingPathComponent("Private/home")
         let key = privateHome.appendingPathComponent(".android/adbkey")
         if FileManager.default.fileExists(atPath: key.path) {
@@ -51,7 +52,7 @@ final class RemoteController: ObservableObject {
         let process = Process()
         let pipe = Pipe()
         process.executableURL = adb
-        process.arguments = arguments
+        process.arguments = ["-P", serverPort] + arguments
         process.environment = environment
         process.standardOutput = pipe
         process.standardError = pipe
@@ -79,9 +80,13 @@ final class RemoteController: ObservableObject {
         work.async { [self] in
             let result = runADB(["connect", target])
             let state = runADB(["-s", target, "get-state"])
+            let model = state.0 == 0 && state.1 == "device"
+                ? runADB(["-s", target, "shell", "getprop", "ro.product.model"]).1
+                : ""
             DispatchQueue.main.async {
                 if state.0 == 0 && state.1 == "device" {
                     self.endpoint = target
+                    self.isBueller = model.trimmingCharacters(in: .whitespacesAndNewlines) == "AFTB"
                     self.connected = true
                     self.status = "Connected to \(target)"
                 } else {
@@ -119,7 +124,11 @@ final class RemoteController: ObservableObject {
         let process = Process()
         process.executableURL = executable
         process.currentDirectoryURL = folder
-        process.arguments = ["--serial", endpoint, "--no-audio", "--window-title", "Fire TV Mirror"]
+        var arguments = ["--serial", endpoint, "--no-audio", "--window-title", "Scrcpy Visual Mirror"]
+        if isBueller {
+            arguments += ["--max-size=800", "--video-codec=vp8", "--video-encoder=OMX.google.vp8.encoder"]
+        }
+        process.arguments = arguments
         var values = environment
         values["ADB"] = folder.appendingPathComponent("adb").path
         values["SCRCPY_SERVER_PATH"] = folder.appendingPathComponent("scrcpy-server").path
@@ -163,8 +172,8 @@ private struct RemoteView: View {
         VStack(spacing: 20) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("FIRE TV").font(.system(size: 14, weight: .bold, design: .rounded)).tracking(4)
-                    Text("REMOTE").font(.system(size: 33, weight: .black, design: .rounded)).tracking(1)
+                    Text("SCRCPY").font(.system(size: 14, weight: .bold, design: .rounded)).tracking(4)
+                    Text("VISUAL").font(.system(size: 33, weight: .black, design: .rounded)).tracking(1)
                 }
                 Spacer()
                 Circle()
@@ -234,9 +243,6 @@ private struct RemoteView: View {
             .tint(Palette.accent)
             .disabled(!remote.connected)
 
-            Text("Authorized ADB required  |  No key is in the public build")
-                .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.45))
         }
         .padding(24)
         .frame(width: 380)
@@ -249,11 +255,11 @@ private struct RemoteView: View {
 }
 
 @main
-struct FireTVRemoteApp: App {
+struct ScrcpyVisualApp: App {
     @StateObject private var remote = RemoteController()
 
     var body: some Scene {
-        WindowGroup("Fire TV Remote") {
+        WindowGroup("Scrcpy Visual") {
             RemoteView(remote: remote)
         }
         .windowResizability(.contentSize)

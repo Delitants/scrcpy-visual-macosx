@@ -1,4 +1,4 @@
-# Fire TV Remote for macOS
+# Scrcpy Visual for macOS
 
 A native macOS remote for Fire TV and other Android TV devices with authorized
 ADB access. The remote sends Home, Back, navigation, Select, media, and volume
@@ -9,6 +9,8 @@ The app connects directly to the device over the local network; it does not
 require a Linux relay. The Fire TV must have network ADB enabled, and its ADB
 authorization prompt must already have been accepted for the key used by this
 Mac. This app cannot bypass ADB authorization or pair a Bluetooth remote.
+On first-generation AFTB devices, Scrcpy Visual selects the tested VP8 encoder
+at 800 pixels because the device's H.264 encoder rejects screen capture.
 
 ## Build
 
@@ -18,7 +20,7 @@ macOS scrcpy release. Download and extract the correct architecture from
 
 ```sh
 SCRCPY_DIR=/path/to/extracted/scrcpy-directory ./build.sh
-open dist/FireTVRemote.app
+open "dist/Scrcpy Visual.app"
 ```
 
 The entire official scrcpy release directory, including `adb` and
@@ -40,7 +42,7 @@ key and asks the device for authorization if that key has not been approved.
 For a private, local-only installation, the app also supports a key placed at:
 
 ```text
-FireTVRemote.app/Contents/Resources/Private/home/.android/adbkey
+Scrcpy Visual.app/Contents/Resources/Private/home/.android/adbkey
 ```
 
 The matching `adbkey.pub` may be placed alongside it. Never upload, share,
@@ -61,4 +63,3 @@ encrypt the key.
 
 The app's own source is MIT licensed. scrcpy and Android platform-tools retain
 their respective upstream licenses.
-
