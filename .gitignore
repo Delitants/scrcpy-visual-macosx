@@ -1,0 +1,10 @@
+.DS_Store
+/dist/
+*.app/
+*.zip
+**/Private/
+**/.android/
+**/adbkey
+**/adbkey.pub
+*.p12
+
