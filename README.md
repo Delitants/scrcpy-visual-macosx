@@ -1,16 +1,21 @@
 # Scrcpy Visual for macOS
 
-A native macOS remote for Fire TV and other Android TV devices with authorized
+A native macOS remote for Android TV devices and other Android boxes with authorized
 ADB access. The remote sends Home, Back, navigation, Select, media, and volume
 keys. A separate [scrcpy](https://github.com/Genymobile/scrcpy) window provides
 optional screen mirroring and mouse control.
 
 The app connects directly to the device over the local network; it does not
-require a Linux relay. The Fire TV must have network ADB enabled, and its ADB
+require a Linux relay. The Android device must have network ADB enabled, and its ADB
 authorization prompt must already have been accepted for the key used by this
 Mac. This app cannot bypass ADB authorization or pair a Bluetooth remote.
 On first-generation AFTB devices, Scrcpy Visual selects the tested VP8 encoder
-at 800 pixels because the device's H.264 encoder rejects screen capture.
+at 800 pixels by default because the device's H.264 encoder rejects screen capture.
+The Mirror Size menu offers higher limits for experimentation. It limits the
+longest screen dimension, preserves the aspect ratio, and takes effect when a
+new mirror is opened. Higher choices may fail on older device encoders; return
+to Automatic or 800 px if that happens. Automatic uses the device resolution
+on other Android boxes.
 
 ## Build
 
@@ -29,7 +34,7 @@ that directory. The remote also works without the bundled scrcpy files when
 `adb` is installed at `/opt/homebrew/bin/adb` or `/usr/local/bin/adb`, but
 mirroring requires a bundled scrcpy release.
 
-Enter your device's LAN address in the app and select **Connect**. The default
+Enter your Android device's LAN address in the app and select **Connect**. The default
 ADB TCP port is `5555`; an explicit `host:port` is also accepted. The app
 remembers the last address locally in macOS preferences. It uses a separate
 local ADB server port so it does not interfere with your usual ADB session.

@@ -11,8 +11,9 @@ private enum Palette {
 
 final class RemoteController: ObservableObject {
     @Published var host = UserDefaults.standard.string(forKey: "host") ?? ""
-    @Published var status = "Enter your Fire TV address to connect."
+    @Published var status = "Enter your Android device address to connect."
     @Published var connected = false
+    @Published var mirrorMaxSize = UserDefaults.standard.object(forKey: "mirrorMaxSize") as? Int ?? 0
 
     private let work = DispatchQueue(label: "com.delitants.FireTVRemoteMac.adb")
     private let serverPort = "5038"
@@ -118,15 +119,19 @@ final class RemoteController: ObservableObject {
             return
         }
         if mirrorProcess?.isRunning == true {
-            NSApp.activate(ignoringOtherApps: true)
+            status = "Close the current mirror, then reopen it to change resolution."
             return
         }
         let process = Process()
         process.executableURL = executable
         process.currentDirectoryURL = folder
         var arguments = ["--serial", endpoint, "--no-audio", "--window-title", "Scrcpy Visual Mirror"]
+        let effectiveMaxSize = mirrorMaxSize == 0 && isBueller ? 800 : mirrorMaxSize
+        if effectiveMaxSize > 0 {
+            arguments.append("--max-size=\(effectiveMaxSize)")
+        }
         if isBueller {
-            arguments += ["--max-size=800", "--video-codec=vp8", "--video-encoder=OMX.google.vp8.encoder"]
+            arguments += ["--video-codec=vp8", "--video-encoder=OMX.google.vp8.encoder"]
         }
         process.arguments = arguments
         var values = environment
@@ -232,6 +237,31 @@ private struct RemoteView: View {
             }
             .disabled(!remote.connected)
             .opacity(remote.connected ? 1 : 0.48)
+
+            HStack {
+                Text("MIRROR SIZE")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(2)
+                Spacer()
+                Picker("Mirror size", selection: $remote.mirrorMaxSize) {
+                    Text("Automatic").tag(0)
+                    Text("800 px").tag(800)
+                    Text("1024 px").tag(1024)
+                    Text("1280 px").tag(1280)
+                    Text("1600 px").tag(1600)
+                    Text("1920 px").tag(1920)
+                    Text("3840 px").tag(3840)
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .frame(width: 130)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 9)
+            .background(Palette.panel, in: RoundedRectangle(cornerRadius: 14))
+            .onChange(of: remote.mirrorMaxSize) { value in
+                UserDefaults.standard.set(value, forKey: "mirrorMaxSize")
+            }
 
             Button(action: remote.openMirror) {
                 Label("Open screen mirror", systemImage: "rectangle.on.rectangle")
