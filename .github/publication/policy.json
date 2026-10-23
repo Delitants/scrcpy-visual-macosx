@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "repository": "Delitants/scrcpy-visual-macosx",
+  "baseline": "1c094dde66b2af1a880c8b90454ab35eaed04902",
+  "public_docs": [],
+  "public_data": [],
+  "release_assets": [
+    "Scrcpy-Visual-v*-macosx.zip",
+    "ScrcpyVisual-macosx-arm64-v*.zip",
+    "FireTVRemote-macosx-arm64-v*.zip"
+  ]
+}
